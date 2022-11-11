@@ -633,7 +633,7 @@ class EmbedOrUploadBlock(EmbedBlock):
 
     file_id = field_map(["file_ids", 0])
 
-    def upload_file(self, path):
+    def upload_file(self, path_or_bytes):
 
         mimetype = mimetypes.guess_type(path)[0] or "text/plain"
         filename = os.path.split(path)[-1]
@@ -643,9 +643,16 @@ class EmbedOrUploadBlock(EmbedBlock):
             {"bucket": "secure", "name": filename, "contentType": mimetype},
         ).json()
 
-        with open(path, "rb") as f:
+        if isinstance(path_or_bytes, str):
+            with open(path_or_bytes, "rb") as f:
+                response = requests.put(
+                    data["signedPutUrl"], data=f, headers={"Content-type": mimetype}
+                )
+                response.raise_for_status()
+
+        else:
             response = requests.put(
-                data["signedPutUrl"], data=f, headers={"Content-type": mimetype}
+                data["signedPutUrl"], data=path_or_bytes, headers={"Content-type": mimetype}
             )
             response.raise_for_status()
 
