@@ -633,10 +633,7 @@ class EmbedOrUploadBlock(EmbedBlock):
 
     file_id = field_map(["file_ids", 0])
 
-    def upload_file(self, path_or_bytes):
-
-        mimetype = mimetypes.guess_type(path)[0] or "text/plain"
-        filename = os.path.split(path)[-1]
+    def upload_file(self, path_or_bytes, mimetype, filename):
 
         data = self._client.post(
             "getUploadFileUrl",
@@ -658,7 +655,7 @@ class EmbedOrUploadBlock(EmbedBlock):
 
         self.display_source = data["url"]
         self.source = data["url"]
-        self.file_id = data["url"][len(S3_URL_PREFIX) :].split("/")[0]
+        self.file_id = data["url"][len(S3_URL_PREFIX):].split("/")[0]
 
 
 class VideoBlock(EmbedOrUploadBlock):
