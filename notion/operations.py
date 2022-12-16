@@ -1,7 +1,7 @@
 from .utils import now
 
 
-def build_operation(id, path, args, command="set", table="block"):
+def build_operation(id, path, args, command="set", table="block", **kw):
     """
     Data updates sent to the submitTransaction endpoint consist of a sequence of "operations". This is a helper
     function that constructs one of these operations.
@@ -10,7 +10,7 @@ def build_operation(id, path, args, command="set", table="block"):
     if isinstance(path, str):
         path = path.split(".")
 
-    return {"id": id, "path": path, "args": args, "command": command, "table": table}
+    return {"id": id, "path": path, "args": args, "command": command, "table": table, **kw}
 
 
 def operation_update_last_edited(user_id, block_id):

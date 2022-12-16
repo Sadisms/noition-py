@@ -64,15 +64,15 @@ class NotionClient(object):
     """
 
     def __init__(
-        self,
-        token_v2=None,
-        monitor=False,
-        start_monitoring=False,
-        enable_caching=False,
-        cache_key=None,
-        email=None,
-        password=None,
-        client_specified_retry=None,
+            self,
+            token_v2=None,
+            monitor=False,
+            start_monitoring=False,
+            enable_caching=False,
+            cache_key=None,
+            email=None,
+            password=None,
+            client_specified_retry=None,
     ):
         self.session = create_session(client_specified_retry)
         if token_v2:
@@ -96,7 +96,7 @@ class NotionClient(object):
 
     def start_monitoring(self):
         self._monitor.poll_async()
-    
+
     def _fetch_guest_space_data(self, records):
         """
         guest users have an empty `space` dict, so get the space_id from the `space_view` dict instead,
@@ -113,7 +113,6 @@ class NotionClient(object):
         records["space"] = {
             space["id"]: {"value": space} for space in space_data["results"]
         }
-
 
     def _set_token(self, email=None, password=None):
         if not email:
@@ -219,7 +218,7 @@ class NotionClient(object):
         else:
             view_id = url_or_id
             assert (
-                collection is not None
+                    collection is not None
             ), "If 'url_or_id' is an ID (not a URL), you must also pass the 'collection'"
 
         view = self.get_record_data(
@@ -321,21 +320,21 @@ class NotionClient(object):
         return self.search(query=search, limit=limit)
 
     def search(
-        self,
-        query="",
-        search_type="BlocksInSpace",
-        limit=100,
-        sort="Relevance",
-        source="quick_find",
-        isDeletedOnly=False,
-        excludeTemplates=False,
-        isNavigableOnly=False,
-        requireEditPermissions=False,
-        ancestors=[],
-        createdBy=[],
-        editedBy=[],
-        lastEditedTime={},
-        createdTime={},
+            self,
+            query="",
+            search_type="BlocksInSpace",
+            limit=100,
+            sort="Relevance",
+            source="quick_find",
+            isDeletedOnly=False,
+            excludeTemplates=False,
+            isNavigableOnly=False,
+            requireEditPermissions=False,
+            ancestors=[],
+            createdBy=[],
+            editedBy=[],
+            lastEditedTime={},
+            createdTime={},
     ):
         data = {
             "type": search_type,
@@ -376,21 +375,34 @@ class NotionClient(object):
             "created_time": now(),
             "parent_id": parent.id,
             "parent_table": parent._table,
+            "space_id": self.current_space.id
         }
+
+        pointer = dict(
+            spaceId=self.current_space.id,
+            id=record_id,
+            table=table
+        )
 
         args.update(kwargs)
 
         with self.as_atomic_transaction():
-
             # create the new record
             self.submit_transaction(
                 build_operation(
-                    args=args, command="set", id=record_id, path=[], table=table
+                    args=args,
+                    command="set",
+                    id=record_id,
+                    path=[],
+                    table=table,
+                    pointer=pointer
                 )
             )
 
             # add the record to the content list of the parent, if needed
             if child_list_key:
+                pointer['table'] = parent._table
+
                 self.submit_transaction(
                     build_operation(
                         id=parent.id,
@@ -398,6 +410,7 @@ class NotionClient(object):
                         args={"id": record_id},
                         command="listAfter",
                         table=parent._table,
+                        pointer=pointer
                     )
                 )
 
@@ -405,7 +418,6 @@ class NotionClient(object):
 
 
 class Transaction(object):
-
     is_dummy_nested_transaction = False
 
     def __init__(self, client):

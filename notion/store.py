@@ -26,7 +26,7 @@ Missing = MissingClass()
 
 class Callback(object):
     def __init__(
-        self, callback, record, callback_id=None, extra_kwargs={}, watch_children=True
+            self, callback, record, callback_id=None, extra_kwargs={}, watch_children=True
     ):
         self.callback = callback
         self.record = record
@@ -181,7 +181,7 @@ class RecordStore(object):
         # if it's not found, try refreshing the record from the server
         if result is Missing or force_refresh:
             if table == "block":
-                self.call_load_page_chunk(id,limit=limit)
+                self.call_load_page_chunk(id, limit=limit)
             else:
                 self.call_get_record_values(**{table: id})
             result = self._get(table, id)
@@ -284,7 +284,7 @@ class RecordStore(object):
         }
 
         recordmap = self._client.post("loadPageChunk", data).json()["recordMap"]
-        
+
         self.store_recordmap(recordmap)
 
     def store_recordmap(self, recordmap):
@@ -299,22 +299,22 @@ class RecordStore(object):
                 )
 
     def call_query_collection(
-        self,
-        collection_id,
-        collection_view_id,
-        search="",
-        type="results",
-        aggregate=[],
-        aggregations=[],
-        filter={},
-        sort=[],
-        calendar_by="",
-        group_by="",
-        limit=50
+            self,
+            collection_id,
+            collection_view_id,
+            search="",
+            type="results",
+            aggregate=[],
+            aggregations=[],
+            filter={},
+            sort=[],
+            calendar_by="",
+            group_by="",
+            limit=50
     ):
 
         assert not (
-            aggregate and aggregations
+                aggregate and aggregations
         ), "Use only one of `aggregate` or `aggregations` (old vs new format)"
 
         # convert singletons into lists if needed
@@ -328,7 +328,7 @@ class RecordStore(object):
             "collectionViewId": collection_view_id,
             "loader": {
                 "reducers": {
-                    "collection_group_results":{
+                    "collection_group_results": {
                         "limit": limit,
                         "type": type,
                     }
@@ -338,7 +338,7 @@ class RecordStore(object):
                 "searchQuery": search,
                 "userLocale": "en",
                 "userTimeZone": str(get_localzone()),
-                # "filter": filter,
+                "filter": filter,
                 "sort": sort
             },
         }
@@ -346,9 +346,9 @@ class RecordStore(object):
         if aggregate is not None:
             for entry in aggregate:
                 data["loader"]["reducers"][entry["key"]] = entry
-                
+
         response = self._client.post("queryCollection", data).json()
-        
+
         self.store_recordmap(response["recordMap"])
 
         return response["result"]
@@ -370,7 +370,7 @@ class RecordStore(object):
         for operation in operations:
             self.run_local_operation(**operation)
 
-    def run_local_operation(self, table, id, path, command, args):
+    def run_local_operation(self, table, id, path, command, args, **kw):
 
         with self._mutex:
             path = deepcopy(path)
