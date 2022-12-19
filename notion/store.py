@@ -370,7 +370,7 @@ class RecordStore(object):
         for operation in operations:
             self.run_local_operation(**operation)
 
-    def run_local_operation(self, table, id, path, command, args, **kw):
+    def run_local_operation(self, table, id, path, command, args):
 
         with self._mutex:
             path = deepcopy(path)

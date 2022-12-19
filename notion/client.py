@@ -378,31 +378,18 @@ class NotionClient(object):
             "space_id": self.current_space.id
         }
 
-        pointer = dict(
-            spaceId=self.current_space.id,
-            id=record_id,
-            table=table
-        )
-
         args.update(kwargs)
 
         with self.as_atomic_transaction():
             # create the new record
             self.submit_transaction(
                 build_operation(
-                    args=args,
-                    command="set",
-                    id=record_id,
-                    path=[],
-                    table=table,
-                    pointer=pointer
+                    args=args, command="set", id=record_id, path=[], table=table
                 )
             )
 
             # add the record to the content list of the parent, if needed
             if child_list_key:
-                pointer['table'] = parent._table
-
                 self.submit_transaction(
                     build_operation(
                         id=parent.id,
@@ -410,7 +397,6 @@ class NotionClient(object):
                         args={"id": record_id},
                         command="listAfter",
                         table=parent._table,
-                        pointer=pointer
                     )
                 )
 
