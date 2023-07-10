@@ -338,7 +338,7 @@ class RecordStore(object):
                 "searchQuery": search,
                 "userLocale": "en",
                 "userTimeZone": str(get_localzone()),
-                "filter": filter,
+                # "filter": filter,
                 "sort": sort
             },
         }
