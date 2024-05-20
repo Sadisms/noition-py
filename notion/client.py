@@ -114,7 +114,7 @@ class NotionClient(object):
 
     def _update_user_info(self):
         records = self.post("loadUserContent", {}).json()["recordMap"]
-        if not records["space"]:
+        if not records.get("space"):
             self._fetch_guest_space_data(records)
 
         self._store.store_recordmap(records)
